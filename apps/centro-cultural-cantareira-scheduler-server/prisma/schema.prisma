@@ -1,0 +1,71 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Reservation {
+  createdAt       DateTime  @default(now())
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  customerId      String?
+  event           Event?    @relation(fields: [eventId], references: [id])
+  eventId         String?
+  id              String    @id @default(cuid())
+  payments        Payment[]
+  reservationDate DateTime?
+  slot            Slot?     @relation(fields: [slotId], references: [id])
+  slotId          String?
+  updatedAt       DateTime  @updatedAt
+}
+
+model Customer {
+  createdAt    DateTime      @default(now())
+  email        String?
+  id           String        @id @default(cuid())
+  name         String?
+  phoneNumber  String?
+  reservations Reservation[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model Event {
+  createdAt    DateTime            @default(now())
+  description  String?
+  id           String              @id @default(cuid())
+  name         String?
+  reservations Reservation[]
+  typeField    EnumEventTypeField?
+  updatedAt    DateTime            @updatedAt
+}
+
+model Payment {
+  amount        Float?
+  createdAt     DateTime                  @default(now())
+  id            String                    @id @default(cuid())
+  paymentDate   DateTime?
+  paymentMethod EnumPaymentPaymentMethod?
+  reservation   Reservation?              @relation(fields: [reservationId], references: [id])
+  reservationId String?
+  updatedAt     DateTime                  @updatedAt
+}
+
+model Slot {
+  createdAt    DateTime      @default(now())
+  endTime      DateTime?
+  id           String        @id @default(cuid())
+  isAvailable  Boolean?
+  reservations Reservation[]
+  startTime    DateTime?
+  updatedAt    DateTime      @updatedAt
+}
+
+enum EnumEventTypeField {
+  Option1
+}
+
+enum EnumPaymentPaymentMethod {
+  Option1
+}
